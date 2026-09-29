@@ -1,0 +1,23 @@
+* text=auto eol=lf
+
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+*.sln text eol=crlf
+*.vcxproj text eol=crlf
+
+*.uasset binary
+*.umap binary
+*.png binary
+*.jpg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.wasm binary
+*.sqlite binary
+*.db binary
+*.lib binary
+*.a binary
+*.dll binary
+*.so binary
+*.dylib binary
