@@ -4,15 +4,15 @@ Sep 29, 2026 · Felipe Carvajal Brown
 
 ## Summary
 
-Ogiva is an engine-agnostic C++20 ballistics and shooting-analytics SDK. It plugs into Unreal Engine 5.5 as a plugin, and into any other engine or a non-game app through a stable C ABI. It computes physically grounded projectile trajectories, records per-shot telemetry, and turns that telemetry into trainer-grade analysis.
+Ogiva is a ballistics and shooting-analytics plugin for Unreal Engine 5.5 and later. It computes physically grounded projectile trajectories, records per-shot telemetry, and turns that telemetry into trainer-grade analysis.
 
-The flagship demo is a virtual range in UE5.5 plus a subscription dashboard (Rust Axum + Postgres + SvelteKit). The dashboard runs the same C++ analysis lib compiled to WebAssembly. The pitch: training-sim vendors today ship CSV exports; Ogiva ships validated physics, structured telemetry and a dashboard a customer pays for monthly.
+The flagship demo is a virtual range in Unreal Engine plus a subscription dashboard (Rust Axum + Postgres + SvelteKit). The dashboard runs the same C++ analysis lib compiled to WebAssembly. The pitch: training-sim vendors today ship CSV exports; Ogiva ships validated physics, structured telemetry and a dashboard a customer pays for monthly.
 
 ## Goals and non-goals
 
 **Goals**
 
-- One ballistics core, many hosts: UE5.5 plugin first, C ABI for Unity, Godot, Bevy or a native app.
+- One Unreal Engine plugin for UE 5.5 and later, with the solver and analysis in a portable standard-C++ module that also compiles to WASM for the dashboard.
 - Deterministic results: same inputs + seed = same trajectory and same stats on every platform, including WASM.
 - Validated physics: drop and drift tables within a stated tolerance of published reference data.
 - Telemetry and analysis as first-class outputs, not an afterthought CSV.
@@ -32,12 +32,12 @@ The flagship demo is a virtual range in UE5.5 plus a subscription dashboard (Rus
 | Training-sim vendor (e.g. a virtual range company) | Credible physics, reports customers pay for | Core + telemetry + dashboard as a white-label base |
 | Instructor | Know why a trainee misses, track progress | Bias vs dispersion split, trace metrics, sight corrections, trends |
 | Trainee | Clear feedback after each string | Session replay, shot plot, one-line diagnosis |
-| Game developer (any engine) | Realistic bullet drop without writing a solver | Drop-in plugin or C ABI, projectile presets |
+| Unreal Engine developer | Realistic bullet drop without writing a solver | Drop-in plugin, Blueprint nodes, projectile presets |
 | Org admin | Seats, plans, data per unit | Multi-tenant orgs, roles, plan tiers |
 
 ## Architecture
 
-One pure C++20 core, reached through two doors (C++ API and C ABI), with thin adapters per host. The same analysis code runs in the sim and, compiled to WASM, in the dashboard.
+One Unreal Engine plugin with two modules: `OgivaCore`, standard C++ only, holding the solver, environment, telemetry and analysis; and `Ogiva`, the Unreal layer (subsystem, DataAssets, Blueprint nodes, debug draw, replay) that depends on it. The same `OgivaCore` sources run in the sim and, compiled to WASM, in the dashboard (ADR 0002, ADR 0005).
 
 ```mermaid
 C4Container
@@ -45,8 +45,8 @@ C4Container
     Person(trainee, "Trainee")
     Person(instructor, "Instructor")
     System_Boundary(sim, "Range PC") {
-        Container(host, "Host engine", "UE5.5 plugin / any engine", "Scene, input, rendering")
-        Container(core, "Ogiva core", "C++20 + C ABI", "Solver, environment, telemetry, analysis")
+        Container(host, "Unreal layer", "Ogiva module, UE 5.5+", "Scene, input, rendering")
+        Container(core, "OgivaCore", "Standard C++ module", "Solver, environment, telemetry, analysis")
         ContainerDb(local, "Local store", "SQLite", "Offline-first sessions")
         Container(agent, "Sync agent", "Rust", "Uploads sessions")
     }
@@ -76,26 +76,23 @@ C4Container
     UpdateRelStyle(api, stripe, $offsetX="5", $offsetY="10")
 ```
 
-**Dependency rule:** arrows point inward. The core depends on nothing engine- or network-specific; adapters, agent and backend depend on the core's schema, never the reverse.
+**Dependency rule:** arrows point inward. `OgivaCore` includes no engine, network or UI headers; the Unreal layer, agent and backend depend on its telemetry schema, never the reverse.
 
 **Repository layout:**
 
 ```text
 ogiva/
-├── core/                 # pure C++20, CMake, no engine deps
-│   ├── include/ogiva/    # public C++ API + ogiva.h (C ABI)
-│   ├── ballistics/       # model, integrators, zeroing, corrections
-│   ├── environment/      # density, speed of sound, wind, Coriolis
-│   ├── projectiles/      # profile schema, JSON loader, drag tables
-│   ├── impact/           # hit zones, ImpactResolver, protection tables
-│   ├── telemetry/        # schema, ring-buffer recorder, SQLite sink
-│   ├── analysis/         # group stats, CIs, T², trace metrics, Monte Carlo
-│   ├── wasm/             # Emscripten bindings
-│   └── tests/            # Catch2, reference tables, golden files
-├── adapters/
-│   ├── unreal/Ogiva/     # UE5.5 plugin (ThirdParty/ holds prebuilt core)
-│   └── rust/ogiva-sys/   # bindgen crate (v2)
-├── demo/unreal/OgivaRange/  # UE5.5 range demo project
+├── plugin/Ogiva/                 # the product, UE 5.5+
+│   ├── Ogiva.uplugin
+│   └── Source/
+│       ├── OgivaCore/            # standard C++ only, no engine headers
+│       │   ├── Public/  Private/ # ballistics, environment, projectiles,
+│       │   │                     # impact, telemetry, analysis
+│       │   ├── OgivaCore.Build.cs
+│       │   └── CMakeLists.txt    # side build: native tests + WASM
+│       └── Ogiva/                # Unreal layer: subsystem, DataAssets, Blueprint nodes
+├── tests/core/                   # Catch2, reference tables, golden files
+├── demo/OgivaRange/              # range demo; loads the plugin via AdditionalPluginDirectories
 ├── sync-agent/           # Rust
 ├── backend/              # Rust Axum + sqlx, migrations/
 ├── dashboard/            # SvelteKit, pnpm
@@ -177,7 +174,7 @@ Every hit is scored against a zone, including hits on armored zones of targets a
 
 ## Telemetry
 
-Every session is a self-describing, versioned record: session → strings → shots → traces. The host engine never touches the storage format; it calls `ogiva_record_*` and the core does the rest.
+Every session is a self-describing, versioned record: session → strings → shots → traces. Game code never touches the storage format; it calls the recorder through the `Ogiva` module and `OgivaCore` does the rest.
 
 | Record | Key fields |
 | --- | --- |
@@ -225,29 +222,26 @@ T^2 = n\,\bar{\mathbf{x}}^{\mathsf T} S^{-1} \bar{\mathbf{x}}, \qquad \frac{n-2}
 
 **Trends:** per-trainee series of σ, MPI distance and trace metrics across sessions, with a simple regression slope to flag improvement or regression.
 
-## Engine adapters and plugin API
+## Unreal layer and plugin API
 
-The core knows nothing about engines. Hosts talk to it through one of two doors: the C++ API for C++ hosts, or a C ABI (`ogiva.h`) that any language with FFI can call. Adapters are thin: they convert units and axes, forward the host's ray casts, and draw results.
+`OgivaCore` knows nothing about Unreal. The `Ogiva` module is the only code that touches both: it converts units and axes, forwards Unreal's ray casts into `OgivaCore`, and draws results.
 
-**Host callback contract** (the only thing an engine must provide):
+**Callback contract** (what the `Ogiva` module supplies to `OgivaCore`):
 
 - `raycast(from, to) -> hit {point, normal, material_id, zone_id}`, so impacts use the engine's own collision.
 - `material_props(material_id) -> {ricochet_angle, restitution}`.
 - Optional `on_impact`, `on_shot_recorded` callbacks for FX and UI.
 
-**Coordinate and unit rules:** the core is SI, right-handed, Z-up. Each adapter owns its conversion (UE: centimeters, left-handed, Z-up), tested once in the adapter, never scattered across game code.
+**Coordinate and unit rules:** `OgivaCore` is SI, right-handed, Z-up. The `Ogiva` module owns the conversion to Unreal (centimeters, left-handed, Z-up), in one place, tested by UE Automation tests, never scattered across game code.
 
-| Adapter | Form | Priority |
+| Target | Form | Priority |
 | --- | --- | --- |
-| Unreal Engine 5.5 | Plugin: `UOgivaSubsystem` (WorldSubsystem), `UProjectileProfile` DataAsset, Blueprint nodes, debug trajectory draw, replay | v1 |
-| C ABI | `ogiva.h` + shared lib, opaque handles, no exceptions across the boundary | v1 |
-| WebAssembly | Emscripten build of analysis (+ solver) for the dashboard | v1 |
-| Rust | `ogiva-sys` bindgen crate + safe wrapper, usable from Bevy and the backend | v2 |
-| Unity / Godot | C# P/Invoke wrapper; GDExtension | v2, community |
+| Unreal Engine 5.5 and later | Plugin: `UOgivaSubsystem` (WorldSubsystem), `UProjectileProfile` DataAsset, Blueprint nodes, debug trajectory draw, replay | v1 |
+| WebAssembly | Emscripten build of `OgivaCore` analysis (+ solver) for the dashboard, from the side CMake build | v1 |
 
-**Batch mode:** the API accepts arrays of projectiles in SoA layout and steps them together, so a host with thousands of rounds in flight makes one call per tick, not one per bullet.
+**Batch mode:** `OgivaCore` accepts arrays of projectiles in SoA layout and steps them together, so a scene with thousands of rounds in flight makes one call per tick, not one per bullet.
 
-**Versioning:** semantic versioning on the C ABI; the ABI only grows, and every telemetry record carries the SDK and schema version.
+**Versioning:** semantic versioning on the plugin; every telemetry record carries the SDK and schema version.
 
 ## SaaS dashboard demo
 
@@ -299,17 +293,17 @@ The credibility claim rests here: every physics number is checked against someth
 - **Statistics:** analysis functions tested against synthetic groups drawn from a known σ and bias; CI coverage checked by simulation (≈ 95% of intervals contain true σ).
 - **Resolver:** table loading, signature and version checks, zone lookup, and audit-trail completeness on every hit.
 - **Determinism:** same seed → bit-identical telemetry on Linux, Windows, macOS and WASM; golden files in CI.
-- **Adapter tests:** unit and axis conversions in UE via automation tests; C ABI fuzzed for bad handles and NaNs.
-- **CI:** CMake + Catch2 for the core, cargo test for backend and agent, Playwright smoke test for the dashboard.
+- **Unreal tests:** unit and axis conversions and the Blueprint layer via UE Automation tests; physics and analysis are never tested only inside Unreal.
+- **CI:** side CMake build + Catch2 for `OgivaCore` (no Unreal install needed), cargo test for backend and agent, Playwright smoke test for the dashboard.
 
 ## Milestones
 
 Each milestone ends with something demoable; the core comes first because everything else consumes it.
 
-1. **M1 Core solver:** point-mass model, three integrators, drag tables, zeroing, C ABI skeleton. Gate: vacuum and convergence tests green, first reference table within tolerance.
+1. **M1 Core solver:** plugin and `OgivaCore` skeleton with the side CMake build, point-mass model, three integrators, drag tables, zeroing. Gate: vacuum and convergence tests green, first reference table within tolerance.
 2. **M2 Calibers and environment:** projectile profiles, Miller Sg, spin drift, Buck density, OU wind, Coriolis. Gate: full reference set passes.
 3. **M3 Impact, telemetry and analysis:** hit zones, ImpactResolver with the demo table, recorder, SQLite store, group stats, CIs, T² correction, trace metrics, Monte Carlo. Gate: synthetic-group coverage test passes.
-4. **M4 UE5.5 plugin and range demo:** subsystem, DataAssets, Blueprint nodes, debug draw, replay, one playable range with an adversary scenario. Gate: 60 fps with the solver in the loop on a mid-range PC.
+4. **M4 Unreal layer and range demo:** subsystem, DataAssets, Blueprint nodes, debug draw, replay, one playable range with an adversary scenario. Gate: 60 fps with the solver in the loop on a mid-range PC.
 5. **M5 SaaS:** WASM build, Axum backend with RLS, sync agent, SvelteKit dashboard, Stripe test billing. Gate: a session shot in UE shows up in the dashboard with identical stats.
 6. **M6 Polish for the pitch:** C4 diagrams, error-analysis report, a 2-minute video walking from shot to dashboard.
 
@@ -321,7 +315,7 @@ Each milestone ends with something demoable; the core comes first because everyt
 - G1/G7 reference data licensing: use tables from public-domain sources and document provenance.
 - Protection-table validity is the customer's responsibility; the engine must make the table version visible on every result.
 - Scope creep toward a full product: the pitch needs M1 to M4 solid more than M5 complete.
-- UE build friction linking an external CMake lib: ship the core as a prebuilt static lib per platform inside the plugin's ThirdParty folder.
+- Two build definitions for `OgivaCore` (Build.cs for UnrealBuildTool, CMake for tests and WASM) can drift in sources or floating-point flags. Mitigation: `OgivaCore.Build.cs` sets the same determinism flags explicitly, and the M4 gate compares Unreal results against the CMake build.
 
 **Open questions**
 
