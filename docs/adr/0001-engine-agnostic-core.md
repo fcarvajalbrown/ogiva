@@ -1,6 +1,6 @@
 # ADR 0001: Engine-agnostic core with a C ABI
 
-- Status: Accepted
+- Status: Superseded by 0005
 - Date: 2026-09-29
 
 ## Context
