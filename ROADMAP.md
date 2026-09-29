@@ -4,8 +4,10 @@ Each milestone ends with something demoable and a gate that must pass before the
 
 ## M1 Core solver
 
-- [ ] CMake presets (`dev`, `release`, `wasm`), clang-format, clang-tidy, CI skeleton
-- [ ] `ogiva.h` C ABI skeleton: context create/destroy, version query, error codes
+ADRs: [0002](docs/adr/0002-wasm-analysis.md), [0005](docs/adr/0005-unreal-first-plugin.md)
+
+- [ ] Side CMake build for `OgivaCore` with presets (`dev`, `release`, `wasm`), `.clang-format` in Unreal conventions, clang-tidy, CI skeleton
+- [ ] `Ogiva.uplugin` and `OgivaCore` module skeleton: Build.cs with determinism flags, version query, error codes
 - [ ] State and vector types, SI units, Z-up
 - [ ] G1/G7 drag tables with PCHIP interpolation
 - [ ] Point-mass model (drag + gravity + Coriolis)
@@ -44,16 +46,16 @@ Each milestone ends with something demoable and a gate that must pass before the
 
 **Gate:** synthetic-group CI coverage ≈ 95%; recorder never blocks the host thread under load test.
 
-## M4 UE5.5 plugin and range demo
+## M4 Unreal layer and range demo
 
-- [ ] Plugin module with prebuilt core in `ThirdParty/`
+- [ ] `Ogiva` runtime module depending on `OgivaCore`, tested on UE 5.5 and the latest UE 5.x
 - [ ] `UOgivaSubsystem`, `UProjectileProfile` DataAsset, Blueprint nodes
-- [ ] UE unit/axis adapter + automation tests
+- [ ] UE unit/axis conversion in the `Ogiva` module + UE Automation tests
 - [ ] Debug trajectory draw, shot replay
 - [ ] `OgivaRange` demo: static range, known-distance targets, one adversary scenario with armored zones
 - [ ] In-game session summary panel
 
-**Gate:** 60 fps with the solver in the loop on a mid-range PC; UE results match core results within float tolerance.
+**Gate:** 60 fps with the solver in the loop on a mid-range PC; UE results match the side CMake build within float tolerance.
 
 ## M5 SaaS
 
@@ -79,7 +81,5 @@ Each milestone ends with something demoable and a gate that must pass before the
 
 ## Later (v2)
 
-- Rust `ogiva-sys` crate and Bevy example
-- Unity (C#) and Godot (GDExtension) adapters
 - Camera-calibration adapter for projector/laser ranges
 - On-prem / air-gapped deployment bundle
