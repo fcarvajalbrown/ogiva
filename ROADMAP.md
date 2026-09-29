@@ -7,6 +7,7 @@ Each milestone ends with something demoable and a gate that must pass before the
 ADRs: [0002](docs/adr/0002-wasm-analysis.md), [0005](docs/adr/0005-unreal-first-plugin.md)
 
 - [ ] Side CMake build for `OgivaCore` with presets (`dev`, `release`, `wasm`), `.clang-format` in Unreal conventions, clang-tidy, CI skeleton
+  - Done: `.gitattributes`, `.gitignore`, `.editorconfig`, `.clang-format` (verified with clang-format 23.1.2). Next: `.clang-tidy`, then `CMakePresets.json` (Ninja + MSVC). Toolchain on the dev machine: CMake 4.2, MSVC via VS 2026, LLVM 23.1.2, Ninja 1.13.2; Emscripten not installed yet.
 - [ ] `Ogiva.uplugin` and `OgivaCore` module skeleton: Build.cs with determinism flags, version query, error codes
 - [ ] State and vector types, SI units, Z-up
 - [ ] G1/G7 drag tables with PCHIP interpolation
