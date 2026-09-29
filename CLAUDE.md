@@ -4,19 +4,17 @@ Context and rules for working in the Ogiva repo. Read `docs/PRD.md` before any n
 
 ## What Ogiva is
 
-An engine-agnostic C++20 ballistics and shooting-analytics SDK. Pure core + C ABI, thin engine adapters (UE5.5 first), a Rust sync agent, a Rust Axum backend and a SvelteKit dashboard that runs the core's analysis compiled to WASM. Portfolio project aimed at tactical training-simulation vendors that sell worldwide.
+A ballistics and shooting-analytics plugin for Unreal Engine 5.5 and later (ADR 0005). A portable standard-C++ module (`OgivaCore`) plus an Unreal layer (`Ogiva`), a Rust sync agent, a Rust Axum backend and a SvelteKit dashboard that runs the core's analysis compiled to WASM. Portfolio project aimed at tactical training-simulation vendors that sell worldwide.
 
 ## Repo map
 
 | Path | What lives there |
 | --- | --- |
-| `core/` | Pure C++20 SDK, CMake, no engine or network deps |
-| `core/include/ogiva/` | Public C++ API and `ogiva.h` (C ABI) |
-| `core/{ballistics,environment,projectiles,impact,telemetry,analysis}/` | Modules, one responsibility each |
-| `core/wasm/` | Emscripten bindings |
-| `core/tests/` | Catch2 tests, reference tables, golden files |
-| `adapters/unreal/Ogiva/` | UE5.5 plugin; prebuilt core in `ThirdParty/` |
-| `demo/unreal/OgivaRange/` | UE5.5 range demo project |
+| `plugin/Ogiva/` | UE 5.5+ plugin, `Ogiva.uplugin` |
+| `plugin/Ogiva/Source/OgivaCore/` | Standard C++ only: ballistics, environment, projectiles, impact, telemetry, analysis; `Build.cs` plus side `CMakeLists.txt` for tests and WASM |
+| `plugin/Ogiva/Source/Ogiva/` | Unreal layer: subsystem, DataAssets, Blueprint nodes, debug draw, replay |
+| `tests/core/` | Catch2 tests, reference tables, golden files |
+| `demo/OgivaRange/` | Range demo project, loads the plugin via `AdditionalPluginDirectories` |
 | `sync-agent/` | Rust, local SQLite to API upload |
 | `backend/` | Rust Axum + sqlx + Postgres, `migrations/` |
 | `dashboard/` | SvelteKit |
@@ -24,9 +22,10 @@ An engine-agnostic C++20 ballistics and shooting-analytics SDK. Pure core + C AB
 
 ## Architecture rules
 
-- Dependencies point inward. `core/` never includes engine, network or UI headers. Adapters, agent and backend depend on the core's schema, never the reverse.
-- Core is SI units, right-handed, Z-up. Unit and axis conversion happens only in adapters, in one place, with a test.
-- The C ABI only grows. No exceptions, STL types or ownership surprises cross it: opaque handles, POD structs, explicit create/destroy.
+- Dependencies point inward. `OgivaCore` never includes engine, network or UI headers: no UObject, no engine math types, no engine containers. The `Ogiva` module, agent and backend depend on its schema, never the reverse.
+- `OgivaCore` is SI units, right-handed, Z-up. Unit and axis conversion to Unreal happens only in the `Ogiva` module, in one place, with a UE Automation test.
+- `OgivaCore.Build.cs` and its side `CMakeLists.txt` list the same sources and the same determinism flags.
+- Physics and analysis are tested in the side CMake build with Catch2, never only inside Unreal.
 - Determinism is a feature: no `-ffast-math`, FMA contraction off, seeded RNG only, no wall-clock time inside the solver. Same seed must give bit-identical telemetry on all targets.
 - Integrators sit behind the `Integrator` interface. Physics never depends on frame rate.
 - Hot paths take SoA batches; no per-projectile virtual calls in the step loop.
@@ -41,7 +40,7 @@ An engine-agnostic C++20 ballistics and shooting-analytics SDK. Pure core + C AB
 ## Code conventions
 
 - Comments: one line only. No multi-line or block comments anywhere; informal wording is fine if it keeps it to one line.
-- C++20, `clang-format` and `clang-tidy` configs at repo root are authoritative.
+- C++20 in Unreal Engine coding conventions, `OgivaCore` included. `clang-format` and `clang-tidy` configs at repo root are authoritative.
 - Rust: `cargo fmt`, `cargo clippy -D warnings`.
 - JavaScript/TypeScript: pnpm only, never npm or yarn. Non-negotiable.
 - Python (tooling scripts only): remind Felipe to create and activate a venv before installing anything.
