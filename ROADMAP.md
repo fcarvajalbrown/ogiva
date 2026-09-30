@@ -18,13 +18,14 @@ ADRs: [0002](docs/adr/0002-wasm-analysis.md), [0005](docs/adr/0005-unreal-first-
   - Catch2 v3.16.0 vendored under `tests/core/vendor/catch2`, GPG-verified and byte-identical to the tag.
 - [x] State and vector types, SI units, Z-up
   - Header-only `FVector3`, `FProjectileState`, `FStateDerivative` and `Advance` in `double` (ADR 0006). CI green on all five jobs.
-- [ ] G1/G7 drag tables with PCHIP interpolation
+- [x] G1/G7 drag tables with PCHIP interpolation
   - API agreed: generic `FPchipCurve` (validated `Create` from X/Y spans, `Evaluate` clamps outside the knots) plus `EDragModel { G1, G7 }`, `GetReferenceDragCurve` and `ReferenceDragCoefficient`, with G1/G7 compiled in. The generic curve leaves room for customer Doppler-derived Cd curves (custom drag models) in M2 profiles.
   - Survey of other solvers: bclibc, the C++ core of py-ballisticcalc (LGPL-3.0, algorithm only, no code copied), moved its drag curve to PCHIP with per-segment Horner coefficients and binary search, but extrapolates the end cubic past the last knot. gehtsoft's BallisticCalculator line uses piecewise 3-point quadratics, neither monotone nor C1. JBM's McCoy-derived programs use CD vs Mach tables.
   - Ogiva therefore stores per-segment Horner coefficients, uses SciPy's weighted harmonic-mean interior slopes with three-point shape-preserving endpoints, and clamps instead of extrapolating.
   - Data found: JBM hosts `mcg1.txt` (79 points) and `mcg7.txt` (84 points), Mach 0 to 5, 4 significant digits, stated as sourced from BRL and posted with McCoy's permission, under a JBM site copyright notice. Primary BRL source for G7 not located yet; McCoy's *Modern Exterior Ballistics* tabulates G1 and G7.
-  - Decision: no G1/G7 numbers enter the repo until a primary public source is found (PRD: public-domain sources with documented provenance).
-  - `FPchipCurve` landed with tests (validation, knot exactness, linear reproduction, hand-derived slopes, endpoint limiter, monotone knee, peak, clamping). CI green on all five jobs; UE 5.5 BuildPlugin green. `EDragModel`, `GetReferenceDragCurve` and `ReferenceDragCoefficient` wait for the data.
+  - First decision was to hold the G1/G7 numbers until a primary public source turned up. None was found, so Felipe had JBM's tables checked by a lawyer and cleared them for import. Provenance, hashes and the regeneration command are in [docs/drag-tables.md](docs/drag-tables.md).
+  - `FPchipCurve` landed with tests (validation, knot exactness, linear reproduction, hand-derived slopes, endpoint limiter, monotone knee, peak, clamping). CI green on all five jobs; UE 5.5 BuildPlugin green.
+  - `EDragModel`, `GetReferenceDragCurve` and `ReferenceDragCoefficient` in `OgivaDrag.h`, compiled from `tests/core/data/drag/mcg1.txt` and `mcg7.txt` by `tools/drag-tables/generate_reference_drag_data.py`. Tests read the same files: every knot matches exactly, and no interval of either table overshoots its neighbouring knots.
   - Sources checked on the DTIC mirror at archive.org, none tabulating G1/G7 Cd vs Mach: BRL Report 1900 (McCoy 1976, ADB012872, since approved for public release; wind effects only), ADA171462 (BRL-MR-3523), ADA205633 (7.62 mm match bullets), ADA098110 (MC DRAG), ADA162133 (5.56 mm NATO), ADA554683 (BC comparison, public release; discusses G1/G7 BCs but prints no table). apps.dtic.mil returns 403 to scripted requests.
 - [ ] Point-mass model (drag + gravity + Coriolis)
 - [ ] `Integrator` interface: Euler, RK4, Dormand–Prince RK45
