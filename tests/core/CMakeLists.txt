@@ -7,6 +7,7 @@ target_include_directories(Catch2 SYSTEM PUBLIC
 target_compile_features(Catch2 PUBLIC cxx_std_20)
 
 add_executable(OgivaCoreTests
+	AimTests.cpp
 	DragTests.cpp
 	ErrorTests.cpp
 	FlightTests.cpp
@@ -19,6 +20,9 @@ add_executable(OgivaCoreTests
 	VersionTests.cpp)
 
 target_link_libraries(OgivaCoreTests PRIVATE Ogiva::Core Catch2)
+
+target_include_directories(OgivaCoreTests PRIVATE
+	${CMAKE_CURRENT_SOURCE_DIR}/../../plugin/Ogiva/Source/OgivaCore/Private)
 
 target_compile_definitions(OgivaCoreTests PRIVATE
 	OGIVA_EXPECTED_VERSION_MAJOR=${PROJECT_VERSION_MAJOR}
