@@ -114,5 +114,6 @@ Versioning: `Ogiva.uplugin` stays at 0.1.0 through M1 and bumps to 0.2.0 when th
 ## Later (v2)
 
 - Camera-calibration adapter for projector/laser ranges
-  - Raised by Felipe: a friend's company runs a live-fire-style simulator projecting onto a wall, where projector lens distortion made shot-to-image accuracy a hard math problem they solved; Felipe wants Ogiva to do it better. Open: detection method (laser plus camera or gun-mounted sensor), screen shape and projector count, the symptom they fought, what their fix was, and whether this is the PRD's target company. Priority (still v2 or earlier) to be decided once scoped.
+  - Raised by Felipe: a friend's company runs a simulator projecting onto a wall, where projector lens distortion made shot-to-image accuracy a hard math problem they solved with an equation Felipe does not recall; Felipe wants Ogiva to do it better.
+  - Answers so far: their detection and screen setup are proprietary, so Ogiva must support every detection method and screen type used by the leading systems, chosen by research. Their symptom and fix are unknown. Felipe believes the friend's company is the PRD's target company, pending his confirmation; if confirmed, the PRD open question on projector ranges closes and this item's priority moves up from v2.
 - On-prem / air-gapped deployment bundle
