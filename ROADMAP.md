@@ -4,7 +4,7 @@ Each milestone ends with something demoable and a gate that must pass before the
 
 ## M1 Core solver
 
-ADRs: [0002](docs/adr/0002-wasm-analysis.md), [0005](docs/adr/0005-unreal-first-plugin.md)
+ADRs: [0002](docs/adr/0002-wasm-analysis.md), [0005](docs/adr/0005-unreal-first-plugin.md), [0006](docs/adr/0006-double-precision-core.md)
 
 - [x] Side CMake build for `OgivaCore` with presets (`dev`, `release`, `wasm`), `.clang-format` in Unreal conventions, clang-tidy, CI skeleton
   - `.clang-tidy` enforces Unreal naming except the `b` bool prefix, which clang-tidy cannot express; `#pragma once` allowed.

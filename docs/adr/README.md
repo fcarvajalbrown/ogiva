@@ -7,3 +7,4 @@
 | [0003](0003-protection-tables.md) | Armored-zone outcomes from customer-supplied protection tables | Accepted |
 | [0004](0004-offline-first-telemetry.md) | Offline-first telemetry with a sync agent | Accepted |
 | [0005](0005-unreal-first-plugin.md) | Unreal-first plugin with a portable math module | Supersedes 0001 |
+| [0006](0006-double-precision-core.md) | Double precision throughout OgivaCore | Accepted |
