@@ -132,4 +132,19 @@ namespace Ogiva
 		return StepEach(States, OutResults,
 						[&](const FProjectileState& State) { return DormandPrinceStep(Model, Time, State, TimeStep); });
 	}
+
+	int FEulerIntegrator::ErrorEstimateOrder() const
+	{
+		return 0;
+	}
+
+	int FRk4Integrator::ErrorEstimateOrder() const
+	{
+		return 0;
+	}
+
+	int FDormandPrinceIntegrator::ErrorEstimateOrder() const
+	{
+		return 5;
+	}
 }
