@@ -60,6 +60,7 @@ ADRs: [0002](docs/adr/0002-wasm-analysis.md), [0005](docs/adr/0005-unreal-first-
 
 - [ ] First reference drop table for the gate
   - Felipe chose a published G1/G7 table and confirmed JBM calculator output is cleared for reuse. JBM's online calculators are retired: `jbmtraj-5.1.cgi` now returns a 404 page stating "the JBM Ballistics Calculators ... have been retired and are no longer available". Blocked on Felipe choosing another source.
+  - Source chosen: py-ballisticcalc (LGPL-3.0, independent point-mass solver on the same BRL G1/G7 tables), run locally from a `tools/reference-trajectory/` script; only its numeric output, inputs and version get committed. Whether committing that output is fine under the LGPL is Felipe's to confirm with his lawyer.
 
 **Gate:** vacuum and convergence tests green; first reference drop table within tolerance.
 
