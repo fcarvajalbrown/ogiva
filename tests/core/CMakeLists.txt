@@ -10,6 +10,7 @@ add_executable(OgivaCoreTests
 	DragTests.cpp
 	ErrorTests.cpp
 	PchipTests.cpp
+	PointMassTests.cpp
 	StateTests.cpp
 	VectorTests.cpp
 	VersionTests.cpp)
