@@ -1,6 +1,7 @@
 <p align="center"><img src="assets/logo.svg" alt="Ogiva logo, an upright bullet inside a target ring" width="128"></p>
 <h1 align="center">Ogiva</h1>
 <p align="center">
+  <a href="https://github.com/fcarvajalbrown/ogiva/actions/workflows/core.yml"><img src="https://github.com/fcarvajalbrown/ogiva/actions/workflows/core.yml/badge.svg" alt="CI status"></a>
   <img src="https://img.shields.io/badge/C%2B%2B-20-1E4E8C.svg?logo=cplusplus" alt="C++20">
   <img src="https://img.shields.io/badge/Unreal%20Engine-5.5%2B-1E4E8C.svg?logo=unrealengine" alt="Unreal Engine 5.5+">
   <img src="https://img.shields.io/badge/Rust-stable-F26B1D.svg?logo=rust" alt="Rust stable">
