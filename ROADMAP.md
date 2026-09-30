@@ -116,5 +116,6 @@ Versioning: `Ogiva.uplugin` stays at 0.1.0 through M1 and bumps to 0.2.0 when th
 - Camera-calibration adapter for projector/laser ranges
   - Raised by Felipe: a friend's company runs a simulator projecting onto a wall, where projector lens distortion made shot-to-image accuracy a hard math problem they solved with an equation Felipe does not recall; Felipe wants Ogiva to do it better.
   - Answers so far: their detection and screen setup are proprietary, so Ogiva must support every detection method and screen type used by the leading systems, chosen by research. Their symptom and fix are unknown. Felipe believes the friend's company is the PRD's target company, pending his confirmation; if confirmed, the PRD open question on projector ranges closes and this item's priority moves up from v2.
+  - Decision: stays in v2. Felipe has no projector, camera or laser hardware to build or test against.
   - Research: [docs/research/projector-calibration.md](docs/research/projector-calibration.md). Leading systems use laser plus fixed cameras, IR spot tracking, camera on weapon, or pose tracking; state of the art for calibration is dense structured-light correspondence, which handles lens distortion, curved screens and multiple projectors, versus the single homography common in low-cost systems.
 - On-prem / air-gapped deployment bundle
