@@ -67,6 +67,11 @@ cargo test --workspace
 pnpm --dir dashboard install && pnpm --dir dashboard test
 ```
 
+On Windows the CMake commands need a VS Developer environment. From any shell:
+
+- `tools\build\dev.cmd` loads MSVC via vswhere, then configures, builds and tests the `dev` preset.
+- `tools\build\ue-build-plugin.cmd D:\EpicGames\UE_5.5` compiles the plugin with UnrealBuildTool (Editor, Game Development, Game Shipping) into `%TEMP%\ogiva-pkg`. Run it after any change to `OgivaCore.Build.cs` or a public header; a green CMake build does not prove the UBT build.
+
 ## Definition of done
 
 - Tests for the change exist and pass locally and in CI.
