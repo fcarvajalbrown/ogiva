@@ -1,4 +1,12 @@
-# Ogiva
+<p align="center"><img src="assets/logo.svg" alt="Ogiva logo, an upright bullet inside a target ring" width="128"></p>
+<h1 align="center">Ogiva</h1>
+<p align="center">
+  <img src="https://img.shields.io/badge/C%2B%2B-20-1E4E8C.svg?logo=cplusplus" alt="C++20">
+  <img src="https://img.shields.io/badge/Unreal%20Engine-5.5%2B-1E4E8C.svg?logo=unrealengine" alt="Unreal Engine 5.5+">
+  <img src="https://img.shields.io/badge/Rust-stable-F26B1D.svg?logo=rust" alt="Rust stable">
+  <img src="https://img.shields.io/badge/WebAssembly-analysis-F26B1D.svg?logo=webassembly" alt="WebAssembly analysis">
+  <img src="https://img.shields.io/badge/status-pre--alpha-C4500F.svg" alt="Status: pre-alpha">
+</p>
 
 Ballistics and shooting-analytics plugin for Unreal Engine 5.5 and later. Validated external-ballistics physics, structured per-shot telemetry, and trainer-grade analysis, with the same analysis code running in the browser via WebAssembly.
 
@@ -47,7 +55,7 @@ Full diagrams and decisions: [docs/PRD.md](docs/PRD.md), [docs/adr/](docs/adr/).
 Requires CMake 3.28+, a C++20 compiler, Rust stable, Node LTS with pnpm, and Unreal Engine 5.5 or later for the plugin and demo.
 
 ```bash
-git clone <repo-url> ogiva && cd ogiva
+git clone https://github.com/fcarvajalbrown/ogiva.git && cd ogiva
 cmake --preset dev && cmake --build --preset dev
 ctest --preset dev
 ```
