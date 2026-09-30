@@ -227,3 +227,10 @@ TEST_CASE("Dormand-Prince is closer to the reference than RK4 at the same step",
 
 	CHECK(DormandPrinceError < Rk4Error / 10.0);
 }
+
+TEST_CASE("Only Dormand-Prince reports an error estimate order", "[integrator]")
+{
+	CHECK(FEulerIntegrator{}.ErrorEstimateOrder() == 0);
+	CHECK(FRk4Integrator{}.ErrorEstimateOrder() == 0);
+	CHECK(FDormandPrinceIntegrator{}.ErrorEstimateOrder() == 5);
+}
