@@ -43,7 +43,8 @@ ADRs: [0002](docs/adr/0002-wasm-analysis.md), [0005](docs/adr/0005-unreal-first-
 - [ ] Target-plane crossing via Hermite dense output
   - Blocked on Felipe: API options presented (general plane with explicit Fixed/Adaptive step control, recommended; downrange plane only; step control inferred from the integrator). Parked while the projector question below is scoped.
 - [ ] Zeroing by secant method, holdover and windage solve
-- [ ] Tests: vacuum parabola, constant-Cd vs RK45, RK4 order of convergence
+- [x] Tests: vacuum parabola, constant-Cd vs RK45, RK4 order of convergence
+  - `tests/core/TrajectoryTests.cpp`: 200-step RK4 and Dormand-Prince vacuum flights stay on the closed-form parabola to rounding; Dormand-Prince matches the analytic gravity-free constant-Cd solution (x = ln(1 + k v0 t)/k) to 4e-16 in distance and 2e-15 in speed; constant-Cd RK4 at 1 ms differs from a 0.1 ms Dormand-Prince reference by 5e-12 m (bound 1e-9); global order measured RK4 4.02 (bound 4 +/- 0.2) and Euler 1.0007 (bound 1 +/- 0.1).
 
 **Gate:** vacuum and convergence tests green; first reference drop table within tolerance.
 
