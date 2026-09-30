@@ -41,6 +41,7 @@ ADRs: [0002](docs/adr/0002-wasm-analysis.md), [0005](docs/adr/0005-unreal-first-
   - Known cost: Euler and RK4 evaluate f once more per step for `EndDerivative`, which the next step's k1 recomputes. Taking the start derivative as an input would remove it; revisit when batching is profiled in M4.
   - Still open for later items: the adaptive RK45 driver (step control with atol/rtol) is part of target-plane crossing and table generation, not this stepper.
 - [ ] Target-plane crossing via Hermite dense output
+  - Blocked on Felipe: API options presented (general plane with explicit Fixed/Adaptive step control, recommended; downrange plane only; step control inferred from the integrator). Parked while the projector question below is scoped.
 - [ ] Zeroing by secant method, holdover and windage solve
 - [ ] Tests: vacuum parabola, constant-Cd vs RK45, RK4 order of convergence
 
@@ -112,4 +113,5 @@ Versioning: `Ogiva.uplugin` stays at 0.1.0 through M1 and bumps to 0.2.0 when th
 ## Later (v2)
 
 - Camera-calibration adapter for projector/laser ranges
+  - Raised by Felipe: a friend's company runs a live-fire-style simulator projecting onto a wall, where projector lens distortion made shot-to-image accuracy a hard math problem they solved; Felipe wants Ogiva to do it better. Open: detection method (laser plus camera or gun-mounted sensor), screen shape and projector count, the symptom they fought, what their fix was, and whether this is the PRD's target company. Priority (still v2 or earlier) to be decided once scoped.
 - On-prem / air-gapped deployment bundle
