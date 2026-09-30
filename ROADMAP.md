@@ -7,8 +7,14 @@ Each milestone ends with something demoable and a gate that must pass before the
 ADRs: [0002](docs/adr/0002-wasm-analysis.md), [0005](docs/adr/0005-unreal-first-plugin.md)
 
 - [ ] Side CMake build for `OgivaCore` with presets (`dev`, `release`, `wasm`), `.clang-format` in Unreal conventions, clang-tidy, CI skeleton
-  - Done: `.gitattributes`, `.gitignore`, `.editorconfig`, `.clang-format` (verified with clang-format 23.1.2), `.clang-tidy` (verified with clang-tidy 23.1.2; Unreal naming enforced except the `b` bool prefix, which clang-tidy cannot express). `CMakePresets.json` (`dev`, `release`, `wasm`; compiler not pinned, so on Windows build from a VS Developer shell). root `CMakeLists.txt` (version 0.1.0, `OGIVA_BUILD_TESTS`). `OgivaCore` side `CMakeLists.txt` (FMA contraction off on MSVC, clang-cl, GCC, Clang and Emscripten; warnings as errors). Version single source of truth is `Ogiva.uplugin` `VersionName`: root CMake and `OgivaCore.Build.cs` both read it. The UBT module startup `.cpp` is the one allowed difference between the Build.cs and CMake source lists. Next: `Ogiva.uplugin`, root CMake reading its version. Toolchain on the dev machine: CMake 4.2, MSVC via VS 2026, LLVM 23.1.2, Ninja 1.13.2; Emscripten not installed yet.
-- [ ] `Ogiva.uplugin` and `OgivaCore` module skeleton: Build.cs with determinism flags, version query, error codes
+  - Done: `.gitattributes`, `.gitignore`, `.editorconfig`, `.clang-format`, `.clang-tidy` (Unreal naming enforced except the `b` bool prefix, which clang-tidy cannot express; `#pragma once` allowed), `CMakePresets.json`, root and `OgivaCore` `CMakeLists.txt`. `dev` configures, builds and passes `ctest` with MSVC 19.51 and warnings as errors; clang-tidy clean on `OgivaCore` and tests. Next: CI skeleton (GitHub Actions: Windows MSVC, Linux GCC/Clang, macOS; clang-format and clang-tidy steps limited to the CMake source list so the UBT-only module startup file is skipped).
+  - Toolchain on the dev machine: CMake 4.2, MSVC 19.51 via VS 2026 (run CMake from a VS Developer shell), LLVM 23.1.2, Ninja 1.13.2, UE 5.5 (full) and UE 5.8 (binary-only install, no UBT source); Emscripten not installed yet.
+- [x] `Ogiva.uplugin` and `OgivaCore` module skeleton: Build.cs with determinism flags, version query, error codes
+  - `Ogiva.uplugin` `VersionName` is the single version source: root CMake and `OgivaCore.Build.cs` both read it.
+  - UBT defaults MSVC to `/fp:fast`, so Build.cs forces `FPSemantics = Precise`. Known gap: under UBT with clang-cl on Windows, `/fp:precise` still allows FMA contraction and UBT exposes no per-module hook to add `-ffp-contract=off`; MSVC is the default Windows compiler, so this only bites if a target opts into clang-cl.
+  - `OGIVACORE_API` expands to `DLLEXPORT` from `HAL/Platform.h`; Build.cs force-includes that header so OgivaCore sources stay free of engine includes. `Private/OgivaCoreModule.cpp` (IMPLEMENT_MODULE) is the one file in Build.cs and not in CMake.
+  - Verified with `RunUAT BuildPlugin` on UE 5.5: Editor, Game Development and Game Shipping build.
+  - Catch2 v3.16.0 vendored under `tests/core/vendor/catch2`, GPG-verified and byte-identical to the tag.
 - [ ] State and vector types, SI units, Z-up
 - [ ] G1/G7 drag tables with PCHIP interpolation
 - [ ] Point-mass model (drag + gravity + Coriolis)
