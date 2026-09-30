@@ -34,9 +34,12 @@ ADRs: [0002](docs/adr/0002-wasm-analysis.md), [0005](docs/adr/0005-unreal-first-
   - Landed in `OgivaPointMass.h` with `StandardGravity` (9.80665 m/s2) and `EarthRotationRate` (7.292115e-5 rad/s) constants. A null drag curve yields NaN rather than silently dropping drag. Tests check drag against the PRD form in m, d and i to 1e-13 relative, wind-relative drag, Coriolis sign (right in the north, left in the south, Eotvos lift eastward) and the BC conversion.
   - Determinism gap for the M2 golden-file gate: `EarthRotationInFrame` uses `std::sin`/`std::cos`, which may differ in the last ulp between libms. The PRD mitigation is Ogiva's own transcendental functions; not written yet.
   - STANAG 4355 Modified Point Mass (spin, yaw of repose) is the NATO standard, aimed at artillery; out of M1 scope per the PRD, candidate for a future ADR.
-- [ ] `Integrator` interface: Euler, RK4, Dormand–Prince RK45
+- [x] `Integrator` interface: Euler, RK4, Dormand–Prince RK45
   - API agreed: abstract `IIntegrator` with one virtual `EError StepBatch(Model, Time, States, TimeStep, OutResults)`, so the virtual cost is per batch, not per projectile; `InvalidArgument` when the spans differ in size. Implementations `FEulerIntegrator`, `FRk4Integrator`, `FDormandPrinceIntegrator`.
   - `FStepResult` holds the new state, the end-point derivative (FSAL for Dormand-Prince, needed by the Hermite target-plane crossing) and `LocalError` as a per-component `FProjectileState` (zero for Euler and RK4), so the RK45 driver can apply a scaled atol + rtol norm across metres and m/s. The accept/reject loop lives in a driver, not in the stepper.
+  - Landed in `OgivaIntegrator.h`. Tests: Euler step exact, RK4 and Dormand-Prince reproduce the vacuum parabola in one step, end derivative equals f(t+h, y), batch equals single steps, and local-error order against a 1000-substep Dormand-Prince reference on a smooth linear-in-Mach drag curve (PCHIP is only C1 at knots, which would pollute the order): RK4 measured 4.94, Dormand-Prince error estimate 4.98, theory 5, tolerance +/-0.3.
+  - Known cost: Euler and RK4 evaluate f once more per step for `EndDerivative`, which the next step's k1 recomputes. Taking the start derivative as an input would remove it; revisit when batching is profiled in M4.
+  - Still open for later items: the adaptive RK45 driver (step control with atol/rtol) is part of target-plane crossing and table generation, not this stepper.
 - [ ] Target-plane crossing via Hermite dense output
 - [ ] Zeroing by secant method, holdover and windage solve
 - [ ] Tests: vacuum parabola, constant-Cd vs RK45, RK4 order of convergence
