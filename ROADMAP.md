@@ -6,8 +6,9 @@ Each milestone ends with something demoable and a gate that must pass before the
 
 ADRs: [0002](docs/adr/0002-wasm-analysis.md), [0005](docs/adr/0005-unreal-first-plugin.md)
 
-- [ ] Side CMake build for `OgivaCore` with presets (`dev`, `release`, `wasm`), `.clang-format` in Unreal conventions, clang-tidy, CI skeleton
-  - Done: `.gitattributes`, `.gitignore`, `.editorconfig`, `.clang-format`, `.clang-tidy` (Unreal naming enforced except the `b` bool prefix, which clang-tidy cannot express; `#pragma once` allowed), `CMakePresets.json`, root and `OgivaCore` `CMakeLists.txt`. `dev` configures, builds and passes `ctest` with MSVC 19.51 and warnings as errors; clang-tidy clean on `OgivaCore` and tests. Next: CI skeleton (GitHub Actions: Windows MSVC, Linux GCC/Clang, macOS; clang-format and clang-tidy steps limited to the CMake source list so the UBT-only module startup file is skipped).
+- [x] Side CMake build for `OgivaCore` with presets (`dev`, `release`, `wasm`), `.clang-format` in Unreal conventions, clang-tidy, CI skeleton
+  - `.clang-tidy` enforces Unreal naming except the `b` bool prefix, which clang-tidy cannot express; `#pragma once` allowed.
+  - CI (`.github/workflows/core.yml`): Windows MSVC via `tools/build/dev.cmd`, Linux GCC, Linux Clang, macOS AppleClang, plus a lint job with LLVM 23 from apt.llvm.org (PyPI only ships clang-tidy 22, which lacks checks the config uses). clang-tidy runs only on the compile database, so the UBT-only module startup file is skipped. First run green on all five jobs.
   - Toolchain on the dev machine: CMake 4.2, MSVC 19.51 via VS 2026 (run CMake from a VS Developer shell), LLVM 23.1.2, Ninja 1.13.2, UE 5.5 (full) and UE 5.8 (binary-only install, no UBT source); Emscripten not installed yet.
 - [x] `Ogiva.uplugin` and `OgivaCore` module skeleton: Build.cs with determinism flags, version query, error codes
   - `Ogiva.uplugin` `VersionName` is the single version source: root CMake and `OgivaCore.Build.cs` both read it.
