@@ -27,10 +27,12 @@ ADRs: [0002](docs/adr/0002-wasm-analysis.md), [0005](docs/adr/0005-unreal-first-
   - `FPchipCurve` landed with tests (validation, knot exactness, linear reproduction, hand-derived slopes, endpoint limiter, monotone knee, peak, clamping). CI green on all five jobs; UE 5.5 BuildPlugin green.
   - `EDragModel`, `GetReferenceDragCurve` and `ReferenceDragCoefficient` in `OgivaDrag.h`, compiled from `tests/core/data/drag/mcg1.txt` and `mcg7.txt` by `tools/drag-tables/generate_reference_drag_data.py`. Tests read the same files: every knot matches exactly, and no interval of either table overshoots its neighbouring knots.
   - Sources checked on the DTIC mirror at archive.org, none tabulating G1/G7 Cd vs Mach: BRL Report 1900 (McCoy 1976, ADB012872, since approved for public release; wind effects only), ADA171462 (BRL-MR-3523), ADA205633 (7.62 mm match bullets), ADA098110 (MC DRAG), ADA162133 (5.56 mm NATO), ADA554683 (BC comparison, public release; discusses G1/G7 BCs but prints no table). apps.dtic.mil returns 403 to scripted requests.
-- [ ] Point-mass model (drag + gravity + Coriolis)
+- [x] Point-mass model (drag + gravity + Coriolis)
   - API agreed: non-virtual `FPointMassModel` built from `FPointMassParams` (reference drag curve, BC in kg/m2 with C = m/(i d^2), air density, speed of sound, constant wind, gravity, Earth rotation in the local frame), called as `Derivative(Time, State)` so M2's time-varying wind needs no API break. Helpers `BallisticCoefficientFromImperial` (lb/in2 x 703.0696) and `EarthRotationInFrame(Latitude, Azimuth)`.
   - Drag term in SI: a = -(pi/8) rho Cd_ref(M) |v_r| v_r / C, matching the PRD equation; bclibc uses the same form in imperial units. Coriolis uses ground velocity: -2 Omega x v.
   - Frame fixed by ADR 0007: X downrange, Y left, Z up.
+  - Landed in `OgivaPointMass.h` with `StandardGravity` (9.80665 m/s2) and `EarthRotationRate` (7.292115e-5 rad/s) constants. A null drag curve yields NaN rather than silently dropping drag. Tests check drag against the PRD form in m, d and i to 1e-13 relative, wind-relative drag, Coriolis sign (right in the north, left in the south, Eotvos lift eastward) and the BC conversion.
+  - Determinism gap for the M2 golden-file gate: `EarthRotationInFrame` uses `std::sin`/`std::cos`, which may differ in the last ulp between libms. The PRD mitigation is Ogiva's own transcendental functions; not written yet.
   - STANAG 4355 Modified Point Mass (spin, yaw of repose) is the NATO standard, aimed at artillery; out of M1 scope per the PRD, candidate for a future ADR.
 - [ ] `Integrator` interface: Euler, RK4, Dormand–Prince RK45
 - [ ] Target-plane crossing via Hermite dense output
