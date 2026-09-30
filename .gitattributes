@@ -21,3 +21,5 @@
 *.dll binary
 *.so binary
 *.dylib binary
+
+tests/core/vendor/** linguist-vendored
