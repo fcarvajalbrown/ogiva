@@ -7,6 +7,7 @@ target_include_directories(Catch2 SYSTEM PUBLIC
 target_compile_features(Catch2 PUBLIC cxx_std_20)
 
 add_executable(OgivaCoreTests
+	DragTests.cpp
 	ErrorTests.cpp
 	PchipTests.cpp
 	StateTests.cpp
@@ -18,7 +19,8 @@ target_link_libraries(OgivaCoreTests PRIVATE Ogiva::Core Catch2)
 target_compile_definitions(OgivaCoreTests PRIVATE
 	OGIVA_EXPECTED_VERSION_MAJOR=${PROJECT_VERSION_MAJOR}
 	OGIVA_EXPECTED_VERSION_MINOR=${PROJECT_VERSION_MINOR}
-	OGIVA_EXPECTED_VERSION_PATCH=${PROJECT_VERSION_PATCH})
+	OGIVA_EXPECTED_VERSION_PATCH=${PROJECT_VERSION_PATCH}
+	OGIVA_TEST_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/data")
 
 if(CMAKE_CXX_COMPILER_FRONTEND_VARIANT STREQUAL "MSVC")
 	target_compile_options(OgivaCoreTests PRIVATE /W4 /permissive- /utf-8)
