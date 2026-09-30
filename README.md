@@ -52,13 +52,15 @@ Full diagrams and decisions: [docs/PRD.md](docs/PRD.md), [docs/adr/](docs/adr/).
 
 ## Quick start
 
-Requires CMake 3.28+, a C++20 compiler, Rust stable, Node LTS with pnpm, and Unreal Engine 5.5 or later for the plugin and demo.
+Requires CMake 3.25+, Ninja, a C++20 compiler, Rust stable, Node LTS with pnpm, and Unreal Engine 5.5 or later for the plugin and demo.
 
 ```bash
 git clone https://github.com/fcarvajalbrown/ogiva.git && cd ogiva
 cmake --preset dev && cmake --build --preset dev
 ctest --preset dev
 ```
+
+On Windows, run the CMake commands from a Visual Studio Developer PowerShell so Ninja finds MSVC.
 
 Engine, backend and dashboard setup: see each folder's README (added per milestone).
 
