@@ -49,7 +49,7 @@ A ballistics and shooting-analytics plugin for Unreal Engine 5.5 and later (ADR 
 ## How to work here
 
 - Scaffold first: agree the full structure of a milestone, then build it file by file.
-- Present one file at a time and wait for feedback before the next.
+- **Do not stop to ask after each file or step.** Build, verify, commit and push through the milestone on your own. Stop and ask only for a critical design decision: public API or ABI shape, a new dependency, an architectural choice that needs an ADR, or a result that contradicts the PRD or ROADMAP.
 - For fixes, give diffs or snippets, not full files, unless asked.
 - Fix bugs at the root cause. Never loosen a tolerance, change test parameters or add a workaround to make a test pass. If a physics test fails, the physics is wrong until proven otherwise.
 - Decision questions go as 2 to 4 multiple-choice options, recommended one marked "(rec)" with a short reason.
