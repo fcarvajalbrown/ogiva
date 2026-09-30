@@ -4,7 +4,7 @@ Each milestone ends with something demoable and a gate that must pass before the
 
 ## M1 Core solver
 
-ADRs: [0002](docs/adr/0002-wasm-analysis.md), [0005](docs/adr/0005-unreal-first-plugin.md), [0006](docs/adr/0006-double-precision-core.md)
+ADRs: [0002](docs/adr/0002-wasm-analysis.md), [0005](docs/adr/0005-unreal-first-plugin.md), [0006](docs/adr/0006-double-precision-core.md), [0007](docs/adr/0007-local-firing-frame.md)
 
 - [x] Side CMake build for `OgivaCore` with presets (`dev`, `release`, `wasm`), `.clang-format` in Unreal conventions, clang-tidy, CI skeleton
   - `.clang-tidy` enforces Unreal naming except the `b` bool prefix, which clang-tidy cannot express; `#pragma once` allowed.
@@ -28,6 +28,10 @@ ADRs: [0002](docs/adr/0002-wasm-analysis.md), [0005](docs/adr/0005-unreal-first-
   - `EDragModel`, `GetReferenceDragCurve` and `ReferenceDragCoefficient` in `OgivaDrag.h`, compiled from `tests/core/data/drag/mcg1.txt` and `mcg7.txt` by `tools/drag-tables/generate_reference_drag_data.py`. Tests read the same files: every knot matches exactly, and no interval of either table overshoots its neighbouring knots.
   - Sources checked on the DTIC mirror at archive.org, none tabulating G1/G7 Cd vs Mach: BRL Report 1900 (McCoy 1976, ADB012872, since approved for public release; wind effects only), ADA171462 (BRL-MR-3523), ADA205633 (7.62 mm match bullets), ADA098110 (MC DRAG), ADA162133 (5.56 mm NATO), ADA554683 (BC comparison, public release; discusses G1/G7 BCs but prints no table). apps.dtic.mil returns 403 to scripted requests.
 - [ ] Point-mass model (drag + gravity + Coriolis)
+  - API agreed: non-virtual `FPointMassModel` built from `FPointMassParams` (reference drag curve, BC in kg/m2 with C = m/(i d^2), air density, speed of sound, constant wind, gravity, Earth rotation in the local frame), called as `Derivative(Time, State)` so M2's time-varying wind needs no API break. Helpers `BallisticCoefficientFromImperial` (lb/in2 x 703.0696) and `EarthRotationInFrame(Latitude, Azimuth)`.
+  - Drag term in SI: a = -(pi/8) rho Cd_ref(M) |v_r| v_r / C, matching the PRD equation; bclibc uses the same form in imperial units. Coriolis uses ground velocity: -2 Omega x v.
+  - Frame fixed by ADR 0007: X downrange, Y left, Z up.
+  - STANAG 4355 Modified Point Mass (spin, yaw of repose) is the NATO standard, aimed at artillery; out of M1 scope per the PRD, candidate for a future ADR.
 - [ ] `Integrator` interface: Euler, RK4, Dormand–Prince RK45
 - [ ] Target-plane crossing via Hermite dense output
 - [ ] Zeroing by secant method, holdover and windage solve
