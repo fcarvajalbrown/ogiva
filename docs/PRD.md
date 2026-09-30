@@ -319,7 +319,7 @@ Each milestone ends with something demoable; the core comes first because everyt
 
 **Open questions**
 
-- [ ] Tolerance targets per range band for the reference-table test.
+- [x] Tolerance targets per range band for the reference-table test: height within 1e-7 x range^2 m, time within 2e-6 s, speed within 1e-3 m/s per row (see `docs/reference-trajectory.md`).
 - [ ] Which projectile profiles to ship as presets, and from which public data.
 - [ ] License: MIT/Apache for the core (portfolio visibility) vs source-available for the SaaS parts.
 - [ ] Does the target company run projector ranges with laser detection? If so, a camera-calibration adapter becomes a v2 priority.

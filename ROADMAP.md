@@ -58,11 +58,15 @@ ADRs: [0002](docs/adr/0002-wasm-analysis.md), [0005](docs/adr/0005-unreal-first-
 - [x] Tests: vacuum parabola, constant-Cd vs RK45, RK4 order of convergence
   - `tests/core/TrajectoryTests.cpp`: 200-step RK4 and Dormand-Prince vacuum flights stay on the closed-form parabola to rounding; Dormand-Prince matches the analytic gravity-free constant-Cd solution (x = ln(1 + k v0 t)/k) to 4e-16 in distance and 2e-15 in speed; constant-Cd RK4 at 1 ms differs from a 0.1 ms Dormand-Prince reference by 5e-12 m (bound 1e-9); global order measured RK4 4.02 (bound 4 +/- 0.2) and Euler 1.0007 (bound 1 +/- 0.1).
 
-- [ ] First reference drop table for the gate
+- [x] First reference drop table for the gate
   - Felipe chose a published G1/G7 table and confirmed JBM calculator output is cleared for reuse. JBM's online calculators are retired: `jbmtraj-5.1.cgi` now returns a 404 page stating "the JBM Ballistics Calculators ... have been retired and are no longer available". Blocked on Felipe choosing another source.
   - Source chosen: py-ballisticcalc (LGPL-3.0, independent point-mass solver on the same BRL G1/G7 tables), run locally from a `tools/reference-trajectory/` script; only its numeric output, inputs and version get committed. Whether committing that output is fine under the LGPL is Felipe's to confirm with his lawyer.
+  - Cases chosen by Felipe: .308 175 gr G7 (BC 0.243, 2600 ft/s) and .308 150 gr G1 (BC 0.400, 2800 ft/s), 1.5 in sight height, 100 yd zero, ICAO sea level, rows every 100 yd to 900 yd (the last range inside py-ballisticcalc's 30 ft constant-density band). Provenance, hash and regeneration in [docs/reference-trajectory.md](docs/reference-trajectory.md).
+  - py-ballisticcalc's RK4 freezes the drag factor over each step (first order in Cd); at a 2.5 us step its own convergence error is at most 2.1e-6 m and 2.3e-7 s. Its drag constant is 8.1e-7 low from six-digit rounding.
+  - Tolerance chosen by Felipe (PRD open question closed): height 1e-7 x range^2 m, time 2e-6 s, speed 1e-3 m/s per row. A first option quoted 1e-8 x range^2 as 0.07 mm at 823 m; that was an arithmetic slip (it is 6.8 um, below the measured 7.3 um), caught before coding and re-asked.
+  - Measured, both cases: height 7.3e-6 m, time 8.3e-7 s, speed 3.8e-4 m/s at worst (823 m), for the reference zero elevation and for Ogiva's own SolveZero + SolveHold. Gate passes.
 
-**Gate:** vacuum and convergence tests green; first reference drop table within tolerance.
+**Gate:** vacuum and convergence tests green; first reference drop table within tolerance. Passed: all M1 items done, version bumped to 0.2.0.
 
 Versioning: `Ogiva.uplugin` stays at 0.1.0 through M1 and bumps to 0.2.0 when the M1 gate passes, instead of per public-API item.
 
