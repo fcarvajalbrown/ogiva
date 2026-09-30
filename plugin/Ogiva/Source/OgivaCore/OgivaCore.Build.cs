@@ -14,6 +14,7 @@ public class OgivaCore : ModuleRules
 		bUseRTTI = false;
 
 		PrivateDependencyModuleNames.Add("Core");
+		ForceIncludeFiles.Add("HAL/Platform.h");
 
 		JsonObject Descriptor = JsonObject.Read(new FileReference(Path.Combine(PluginDirectory, "Ogiva.uplugin")));
 		string[] Version = Descriptor.GetStringField("VersionName").Split('.');
