@@ -1,0 +1,74 @@
+name: core
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build-test:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: windows-msvc
+            os: windows-latest
+          - name: linux-gcc
+            os: ubuntu-latest
+            cxx: g++
+          - name: linux-clang
+            os: ubuntu-latest
+            cxx: clang++
+          - name: macos-clang
+            os: macos-latest
+            cxx: clang++
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Build and test
+        if: runner.os == 'Windows'
+        shell: cmd
+        run: tools\build\dev.cmd
+
+      - name: Install Ninja
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y ninja-build
+
+      - name: Install Ninja
+        if: runner.os == 'macOS'
+        run: brew install ninja
+
+      - name: Build and test
+        if: runner.os != 'Windows'
+        env:
+          CXX: ${{ matrix.cxx }}
+        run: |
+          cmake --preset dev
+          cmake --build --preset dev
+          ctest --preset dev
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install LLVM 23
+        run: |
+          wget -qO llvm.sh https://apt.llvm.org/llvm.sh
+          sudo bash llvm.sh 23
+          sudo apt-get install -y clang-format-23 clang-tidy-23 ninja-build
+
+      - name: clang-format
+        run: git ls-files '*.h' '*.cpp' ':!:tests/core/vendor/**' | xargs clang-format-23 --dry-run --Werror
+
+      - name: clang-tidy
+        env:
+          CXX: clang++-23
+        run: |
+          cmake --preset dev
+          run-clang-tidy-23 -p build/dev -quiet '^(?!.*vendor).*\.cpp$'
