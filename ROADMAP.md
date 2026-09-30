@@ -58,6 +58,9 @@ ADRs: [0002](docs/adr/0002-wasm-analysis.md), [0005](docs/adr/0005-unreal-first-
 - [x] Tests: vacuum parabola, constant-Cd vs RK45, RK4 order of convergence
   - `tests/core/TrajectoryTests.cpp`: 200-step RK4 and Dormand-Prince vacuum flights stay on the closed-form parabola to rounding; Dormand-Prince matches the analytic gravity-free constant-Cd solution (x = ln(1 + k v0 t)/k) to 4e-16 in distance and 2e-15 in speed; constant-Cd RK4 at 1 ms differs from a 0.1 ms Dormand-Prince reference by 5e-12 m (bound 1e-9); global order measured RK4 4.02 (bound 4 +/- 0.2) and Euler 1.0007 (bound 1 +/- 0.1).
 
+- [ ] First reference drop table for the gate
+  - Felipe chose a published G1/G7 table and confirmed JBM calculator output is cleared for reuse. JBM's online calculators are retired: `jbmtraj-5.1.cgi` now returns a 404 page stating "the JBM Ballistics Calculators ... have been retired and are no longer available". Blocked on Felipe choosing another source.
+
 **Gate:** vacuum and convergence tests green; first reference drop table within tolerance.
 
 Versioning: `Ogiva.uplugin` stays at 0.1.0 through M1 and bumps to 0.2.0 when the M1 gate passes, instead of per public-API item.
