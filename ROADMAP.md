@@ -19,6 +19,10 @@ ADRs: [0002](docs/adr/0002-wasm-analysis.md), [0005](docs/adr/0005-unreal-first-
 - [x] State and vector types, SI units, Z-up
   - Header-only `FVector3`, `FProjectileState`, `FStateDerivative` and `Advance` in `double` (ADR 0006). CI green on all five jobs.
 - [ ] G1/G7 drag tables with PCHIP interpolation
+  - API agreed: generic `FPchipCurve` (validated `Create` from X/Y spans, `Evaluate` clamps outside the knots) plus `EDragModel { G1, G7 }`, `GetReferenceDragCurve` and `ReferenceDragCoefficient`, with G1/G7 compiled in. The generic curve leaves room for customer Doppler-derived Cd curves (custom drag models) in M2 profiles.
+  - Survey of other solvers: bclibc, the C++ core of py-ballisticcalc (LGPL-3.0, algorithm only, no code copied), moved its drag curve to PCHIP with per-segment Horner coefficients and binary search, but extrapolates the end cubic past the last knot. gehtsoft's BallisticCalculator line uses piecewise 3-point quadratics, neither monotone nor C1. JBM's McCoy-derived programs use CD vs Mach tables.
+  - Ogiva therefore stores per-segment Horner coefficients, uses SciPy's weighted harmonic-mean interior slopes with three-point shape-preserving endpoints, and clamps instead of extrapolating.
+  - Data found: JBM hosts `mcg1.txt` (79 points) and `mcg7.txt` (84 points), Mach 0 to 5, 4 significant digits, stated as sourced from BRL and posted with McCoy's permission, under a JBM site copyright notice. Primary BRL source for G7 not located yet; McCoy's *Modern Exterior Ballistics* tabulates G1 and G7.
 - [ ] Point-mass model (drag + gravity + Coriolis)
 - [ ] `Integrator` interface: Euler, RK4, Dormand–Prince RK45
 - [ ] Target-plane crossing via Hermite dense output
