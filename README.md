@@ -29,12 +29,14 @@ Training simulators often export results as CSV and leave the analysis to the cu
 
 ## Architecture
 
-```text
-Unreal layer (Ogiva module) ─► OgivaCore (standard C++) ─► local SQLite
-                                                              │
-                                                     sync agent (Rust)
-                                                              ▼
-          dashboard (SvelteKit + OgivaCore as WASM) ◄─ API (Axum) ─► Postgres
+```mermaid
+flowchart LR
+    UE["Unreal layer<br/>(Ogiva module)"] --> Core["OgivaCore<br/>(standard C++)"]
+    Core --> DB[(local SQLite)]
+    DB --> Agent["sync agent<br/>(Rust)"]
+    Agent --> API["API<br/>(Axum)"]
+    API --> PG[(Postgres)]
+    API --> Dash["dashboard<br/>(SvelteKit + OgivaCore WASM)"]
 ```
 
 Full diagrams and decisions: [docs/PRD.md](docs/PRD.md), [docs/adr/](docs/adr/).
