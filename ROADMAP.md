@@ -35,6 +35,8 @@ ADRs: [0002](docs/adr/0002-wasm-analysis.md), [0005](docs/adr/0005-unreal-first-
 
 **Gate:** vacuum and convergence tests green; first reference drop table within tolerance.
 
+Versioning: `Ogiva.uplugin` stays at 0.1.0 through M1 and bumps to 0.2.0 when the M1 gate passes, instead of per public-API item.
+
 ## M2 Calibers and environment
 
 - [ ] Projectile profile schema + JSON loader + validation
