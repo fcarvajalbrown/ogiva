@@ -1,6 +1,7 @@
 add_library(OgivaCore STATIC
 	Private/OgivaDrag.cpp
 	Private/OgivaError.cpp
+	Private/OgivaIntegrator.cpp
 	Private/OgivaPchip.cpp
 	Private/OgivaPointMass.cpp
 	Private/OgivaVersion.cpp)
