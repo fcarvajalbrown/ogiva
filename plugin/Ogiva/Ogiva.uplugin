@@ -1,0 +1,23 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "0.1.0",
+	"FriendlyName": "Ogiva",
+	"Description": "Ballistics and shooting analytics: deterministic point-mass solver, hit zones, telemetry and group stats.",
+	"Category": "Simulation",
+	"CreatedBy": "Felipe Carvajal Brown",
+	"CreatedByURL": "https://github.com/fcarvajalbrown",
+	"DocsURL": "https://github.com/fcarvajalbrown/ogiva",
+	"SupportURL": "https://github.com/fcarvajalbrown/ogiva/issues",
+	"CanContainContent": false,
+	"IsBetaVersion": false,
+	"IsExperimentalVersion": true,
+	"Installed": false,
+	"Modules": [
+		{
+			"Name": "OgivaCore",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
+	]
+}
