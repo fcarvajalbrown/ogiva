@@ -1,5 +1,6 @@
 add_library(OgivaCore STATIC
 	Private/OgivaError.cpp
+	Private/OgivaPchip.cpp
 	Private/OgivaVersion.cpp)
 
 add_library(Ogiva::Core ALIAS OgivaCore)
