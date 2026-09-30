@@ -16,7 +16,8 @@ ADRs: [0002](docs/adr/0002-wasm-analysis.md), [0005](docs/adr/0005-unreal-first-
   - `OGIVACORE_API` expands to `DLLEXPORT` from `HAL/Platform.h`; Build.cs force-includes that header so OgivaCore sources stay free of engine includes. `Private/OgivaCoreModule.cpp` (IMPLEMENT_MODULE) is the one file in Build.cs and not in CMake.
   - Verified with `RunUAT BuildPlugin` on UE 5.5: Editor, Game Development and Game Shipping build.
   - Catch2 v3.16.0 vendored under `tests/core/vendor/catch2`, GPG-verified and byte-identical to the tag.
-- [ ] State and vector types, SI units, Z-up
+- [x] State and vector types, SI units, Z-up
+  - Header-only `FVector3`, `FProjectileState`, `FStateDerivative` and `Advance` in `double` (ADR 0006). CI green on all five jobs.
 - [ ] G1/G7 drag tables with PCHIP interpolation
 - [ ] Point-mass model (drag + gravity + Coriolis)
 - [ ] `Integrator` interface: Euler, RK4, Dormand–Prince RK45
