@@ -9,6 +9,7 @@ target_compile_features(Catch2 PUBLIC cxx_std_20)
 add_executable(OgivaCoreTests
 	DragTests.cpp
 	ErrorTests.cpp
+	FlightTests.cpp
 	IntegratorTests.cpp
 	PchipTests.cpp
 	PointMassTests.cpp
