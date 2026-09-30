@@ -14,6 +14,7 @@ add_executable(OgivaCoreTests
 	IntegratorTests.cpp
 	PchipTests.cpp
 	PointMassTests.cpp
+	ReferenceTrajectoryTests.cpp
 	StateTests.cpp
 	TrajectoryTests.cpp
 	VectorTests.cpp
