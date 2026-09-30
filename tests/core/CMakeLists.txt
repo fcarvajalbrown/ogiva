@@ -8,6 +8,8 @@ target_compile_features(Catch2 PUBLIC cxx_std_20)
 
 add_executable(OgivaCoreTests
 	ErrorTests.cpp
+	StateTests.cpp
+	VectorTests.cpp
 	VersionTests.cpp)
 
 target_link_libraries(OgivaCoreTests PRIVATE Ogiva::Core Catch2)
